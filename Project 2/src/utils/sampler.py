@@ -141,20 +141,15 @@ class Metropolis(Sampler):
         self.n_accepted = 0
         for step in range(nsteps):
             # Calculate the energy of the initial configuration
-            initial_wf_probability = squared_wavefunction(initial_configuration) # TODO: Should we use energy, or the probability (wf.squared)?
-            # initial_wf_log_prob = state.log_marginal_probability_squared(initial_configuration)
+            initial_wf_probability = squared_wavefunction(initial_configuration)
             # Find a new configuration by flipping a random spin
             new_configuration = self.generate_new_spin_config(size_visible=state.n_visible, visible_layer=initial_configuration)
             # Calculate the energy of the new configuration
-            new_wf_probability = squared_wavefunction(new_configuration)        
-            # new_wf_log_prob = state.log_marginal_probability_squared(new_configuration)
+            new_wf_probability = squared_wavefunction(new_configuration)
             # Calculate the acceptance probability for the new configuration
             acceptance_probability = min(1, (new_wf_probability / initial_wf_probability) ** 2) # Acceptance probability according to C6 in Carleo and Troyer 1606.02318v1
-            # log_acceptance_probability = (initial_wf_log_prob - new_wf_log_prob) 
-            # log_acceptance_probability = np.exp(log_acceptance_probability)
             # Accept or reject the new configuration, we can here use regular numpy randomness
             if np.random.random() < acceptance_probability:
-            # if np.random.random() < log_acceptance_probability:
                 self.n_accepted += 1    # To calculate acceptance rate
                 initial_configuration = new_configuration
                 spin_configs.append(initial_configuration)      # might not be needed?
@@ -162,13 +157,6 @@ class Metropolis(Sampler):
             # Find the samples needed for the expectation values to be used in calculating the gradients
             grad_ai, grad_bi, grad_Wij = state.grad_marginal_probability(initial_configuration)
             E_loc_estimate = self.hamiltonian.local_energy_long_int(initial_configuration, n_v=config.nv)
-            # E_loc_estimate = self.hamiltonian.local_energy_long_int(initial_configuration)
-            # if ham_energy < self.tmp_energy:
-            #     self.tmp_energy = ham_energy
-            #     print(f"Energy decreased: {self.tmp_energy}")
-                # breakpoint()
-            # if step % 100 == 0:
-            #     print(f"Step: {step}, ham_energy: {ham_energy}, Config: {state.spin_configuration}")
             
             energies.append(E_loc_estimate)
             grad_a.append(grad_ai)
@@ -182,7 +170,7 @@ class Metropolis(Sampler):
         E_grad_b = 2 * (np.mean(prod_term_b, axis=0) - np.mean(energies) * np.mean(grad_b, axis=0))
         E_grad_W = 2 * (np.mean(prod_term_W, axis=0) - np.mean(energies) * np.mean(grad_W, axis=0))
         # Update the state with the new configuration
-        state.spin_configuration = initial_configuration     # I don't think this is necessary, and could potentially screw over the parallelisation
+        state.spin_configuration = initial_configuration     # TODO: Check with multiproc
         # Calculate statistical properties, and expectation value of local energy
         self.acceptance_rate = self.n_accepted / nsteps
         energies = np.array(energies)
