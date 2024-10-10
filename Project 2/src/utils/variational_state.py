@@ -20,7 +20,7 @@ class RBM:
         # According to Carleo & Troyer, the weights are to be complex-valued
         W = 0.1 * np.random.randn(
             n_visible, n_hidden
-        )  # + 1j * np.random.randn(n_visible, n_hidden)
+        ) + 1j * np.random.randn(n_visible, n_hidden)
         a = 0.1 * np.random.randn(n_visible)
         b = 0.1 * np.random.randn(n_hidden)
         self.T = temperature
