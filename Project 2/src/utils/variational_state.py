@@ -9,26 +9,24 @@ class RBM:
      - In this restricted Boltzmann machine we do not explicitly evaluate the partition function,
         as this, for all our purposes, is a constant factor that will cancel (or can be absorbed in other constants during training).
     """
-    def __init__(self,
-                 n_visible,
-                 n_hidden,
-                 temperature = 1.0
-                 ):
+
+    def __init__(self, n_visible, n_hidden, temperature=1.0):
         """
         Initializes the Restricted Boltzmann Machine
         """
         # Initialize the weights and biases, and the number of visible and hidden units
         self.n_visible = n_visible
         self.n_hidden = n_hidden
-        # According to Carleo & Troyer, the weights are to be complex-valued 
-        W = 0.1 * np.random.randn(n_visible, n_hidden) #+ 1j * np.random.randn(n_visible, n_hidden)
+        # According to Carleo & Troyer, the weights are to be complex-valued
+        W = 0.1 * np.random.randn(
+            n_visible, n_hidden
+        )  # + 1j * np.random.randn(n_visible, n_hidden)
         a = 0.1 * np.random.randn(n_visible)
         b = 0.1 * np.random.randn(n_hidden)
         self.T = temperature
- 
 
         # Initialize the visible and hidden layers
-        visible = np.random.choice([-1, 1], size=n_visible, p=[0.5,0.5])
+        visible = np.random.choice([-1, 1], size=n_visible, p=[0.5, 0.5])
         hidden = np.random.choice([-1, 1], size=n_hidden)
 
         # Save the initial parameters to be able to reset the parameters
@@ -43,7 +41,7 @@ class RBM:
         self._b = np.array(b)
         self._visible = np.array(visible)
         self._hidden = np.array(hidden)
-        
+
     def reset_params(self):
         """
         Reset the parameters of the RBM
@@ -58,10 +56,11 @@ class RBM:
         Compute the magnetization of the system
         """
         return np.sum(self._visible)
-    
-    def __call__(self,
-                 visible,
-                 ):
+
+    def __call__(
+        self,
+        visible,
+    ):
         """
         Evaluate the wavefunction (RBM) given the input (current spin configuration) to the visible layer
         TODO: Remove this function?
@@ -73,29 +72,27 @@ class RBM:
 
         return self._energy
 
-
     def forward_pass(self):
         """
         Forward pass of the RBM
         """
-        input_hidden_layer = self.W @ self.visible + self.a     # Should it be v^T @ W + a
+        input_hidden_layer = self.W @ self.visible + self.a  # Should it be v^T @ W + a
         self.hidden = self.sigmoid(input_hidden_layer)
-
 
     def backward_pass(self):
         """
         Backward pass of the RBM
         """
-        input_visible_layer = self.W.T @ self.hidden + self.b   # Should it be h @ W^T + b
+        input_visible_layer = (
+            self.W.T @ self.hidden + self.b
+        )  # Should it be h @ W^T + b
         self.visible = self.sigmoid(input_visible_layer)
-
 
     def sigmoid(self, x):
         """
         Sigmoid activation function
         """
         return 1 / (1 + np.exp(-x))
-
 
     def log_energy_function(self):
         """
@@ -106,7 +103,6 @@ class RBM:
         hidden_term = -self.b.T @ self.hidden
 
         return interaction_term + visible_term + hidden_term
-    
 
     def energy_function(self):
         """
@@ -116,22 +112,30 @@ class RBM:
         visible_term = -self._a.T @ self._visible
         hidden_term = -self._b.T @ self._hidden
 
-        return np.exp(interaction_term + visible_term + hidden_term)   # Maybe use np.exp instead of np.exp?
-    
-    def log_marginal_probability(self,
-                             visible=None):
+        return np.exp(
+            interaction_term + visible_term + hidden_term
+        )  # Maybe use np.exp instead of np.exp?
+
+    def log_marginal_probability(self, visible=None):
         """
         Compute the marginal probability of the visible layer (this is what represents the wavefunction)
         """
         if visible is None:
-            P_v = (-self._a.T @ self._visible) * 2 * np.log(np.sum(np.cosh(self._b + self._W.T @ self._visible), axis=0))
+            P_v = (
+                (-self._a.T @ self._visible)
+                * 2
+                * np.log(np.sum(np.cosh(self._b + self._W.T @ self._visible), axis=0))
+            )
         else:
-            P_v = (-self._a.T @ visible) * 2 * np.log(np.sum(np.cosh(self._b + self._W.T @ visible), axis=0))
+            P_v = (
+                (-self._a.T @ visible)
+                * 2
+                * np.log(np.sum(np.cosh(self._b + self._W.T @ visible), axis=0))
+            )
 
-        return P_v    
+        return P_v
 
-    def log_marginal_probability_squared(self,
-                                visible=None):
+    def log_marginal_probability_squared(self, visible=None):
         """
         Compute the squared marginal probability of the visible layer (this is what represents the wavefunction probability distribution)
         """
@@ -139,26 +143,28 @@ class RBM:
 
         return 2 * P_v
 
-    def marginal_probability(self,
-                             visible=None):
+    def marginal_probability(self, visible=None):
         """
         Compute the marginal probability of the visible layer (this is what represents the wavefunction)
         """
         if visible is None:
-            P_v = np.exp(1 / self.T * self._a.T @ self._visible) * np.prod(2 * np.cosh(1 / self.T * (self._b + self._W.T @ self._visible)))
+            P_v = np.exp(1 / self.T * self._a.T @ self._visible) * np.prod(
+                2 * np.cosh(1 / self.T * (self._b + self._W.T @ self._visible))
+            )
         else:
-            P_v = np.exp(1 / self.T * self._a.T @ visible) * np.prod(2 * np.cosh( 1 / self.T * (self._b + self._W.T @ visible)))
+            P_v = np.exp(1 / self.T * self._a.T @ visible) * np.prod(
+                2 * np.cosh(1 / self.T * (self._b + self._W.T @ visible))
+            )
 
-        return P_v    
-    
-    def marginal_probability_squared(self,
-                             visible=None):
+        return P_v
+
+    def marginal_probability_squared(self, visible=None):
         """
         Compute the squared marginal probability of the visible layer (this is what represents the wavefunction probability distribution)
         """
         P_v = self.marginal_probability(visible=visible)
 
-        return np.abs(P_v) ** 2    
+        return np.abs(P_v) ** 2
 
     def grad_marginal_probability(self, visible=None):
         """
@@ -170,11 +176,12 @@ class RBM:
             visible = self._visible
         grad_a = visible / self.T
         grad_b = np.tanh(1 / self.T * (self._b + self._W.T @ visible))
-        grad_W = np.outer(visible / self.T,np.tanh(1 / self.T * (self._b + self._W.T @ visible)))
+        grad_W = np.outer(
+            visible / self.T, np.tanh(1 / self.T * (self._b + self._W.T @ visible))
+        )
 
         return grad_a, grad_b, grad_W
-    
-        
+
     def joint_probability(self):
         """
         Compute the joint probability of the visible and hidden layers
@@ -182,7 +189,7 @@ class RBM:
         """
         P_rbm = self.energy_function()
         return P_rbm
-    
+
     @property
     def hidden_layer(self):
         """
@@ -196,7 +203,7 @@ class RBM:
         Return the parameters of the RBM
         """
         return self._W, self._a, self._b
-    
+
     @params.setter
     def params(self, new_params):
         """
@@ -210,7 +217,7 @@ class RBM:
         Return the spin configuration
         """
         return self._visible
-    
+
     @spin_configuration.setter
     def spin_configuration(self, configuration):
         """

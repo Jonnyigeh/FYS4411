@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def generate_seed_sequence(user_seed=None, pool_size=None):
     """Process a user-provided seed and convert it into initial states for
     parallel pool workers.

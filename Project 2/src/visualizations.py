@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
 
+
 def plotstuff(x, y, ylabel, title, save=False, filepath=None):
     keys = y.keys()
     sns.set_theme()
     fig, ax = plt.subplots()
     for key in keys:
         ax.plot(x, y[key], label=key)
-    
-    ax.set(xlabel='Epochs', ylabel=ylabel,
-           title=title)
+
+    ax.set(xlabel="Epochs", ylabel=ylabel, title=title)
     ax.legend()
     if save:
         plt.savefig(filepath)
@@ -53,4 +53,3 @@ sns.set_theme()
 
 
 breakpoint()
-

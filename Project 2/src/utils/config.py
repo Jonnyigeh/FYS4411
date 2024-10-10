@@ -7,9 +7,9 @@ temperature = 1.0
 seed = 0
 
 # MCMC specifics
-n_samples = int(2  ** 14)
-n_procs = 1 # how many subprocess
-sampling_method = "metro" # Metro-hastings does not make sense for ising system
+n_samples = int(2**14)
+n_procs = 1  # how many subprocess
+sampling_method = "metro"  # Metro-hastings does not make sense for ising system
 
 # Hamiltonian specifics
 J = 1.0
