@@ -17,10 +17,10 @@ class RBM:
         # Initialize the weights and biases, and the number of visible and hidden units
         self.n_visible = n_visible
         self.n_hidden = n_hidden
-        # According to Carleo & Troyer, the weights are to be complex-valued
+        # According to Carleo & Troyer, the weights are to be complex-valued, however this is not required for our purpose.
         W = 0.1 * np.random.randn(
             n_visible, n_hidden
-        ) + 1j * np.random.randn(n_visible, n_hidden)
+        )
         a = 0.1 * np.random.randn(n_visible)
         b = 0.1 * np.random.randn(n_hidden)
         self.T = temperature
