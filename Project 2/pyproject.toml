@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "fys44111 project 2"
+version = "0.1.0"
+description = "Dependencies to build, and run, the restricted boltzmann machine to solve the 1D Ising Hamiltonian"
+authors = ["Jonny Aarstad Igeh <jonny.igeh@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.1.2"
+matplotlib = "^3.9.2"
+jax = "^0.4.34"
+tqdm = "^4.66.5"
+black = "^24.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
